@@ -16,6 +16,11 @@ namespace REXTools.CustomTransforms
         World, Self, WorldRaw, SelfRaw
     }
 
+    public enum LinkSpaceRotation
+    {
+        Self, Parent, World
+    }
+
     [ExecuteAlways]
     public abstract class CustomTransformLinks<T> : CustomTransform<T>
     {
@@ -146,7 +151,7 @@ namespace REXTools.CustomTransforms
             {
                 SetToTarget();
 
-                yield return new EditorWaitForSeconds(Time.fixedDeltaTime/* * 2f*/);
+                yield return new EditorWaitForSeconds(Time.fixedDeltaTime * 2f);
             }
         }
 #endif

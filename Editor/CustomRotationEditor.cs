@@ -12,6 +12,10 @@ namespace REXTools.CustomTransforms
     [CustomEditor(typeof(CustomRotation))]
     public class CustomRotationEditor : EditorPRO<CustomRotation>
     {
+        public static bool offsetHandleRotIsRaw = false; //offset
+        public static LinkSpaceRotation selfHandleRot = LinkSpaceRotation.Self; //self
+        public static Space worldHandleRot = Space.Self; //world rotation
+
         //method parameters
         private Space P_Switch_Space;
         private Link P_Switch_Link;
@@ -37,6 +41,8 @@ namespace REXTools.CustomTransforms
             base.OnEnable();
 
             target.RecordParent();
+
+            becomeHidden = false;
         }
 
         public override void OnInspectorGUI()
@@ -134,7 +140,7 @@ namespace REXTools.CustomTransforms
                         if (GUILayout.Button("Target to Current"))
                         {
                             Undo.RecordObject(target.gameObject, "Re-Oriented CustomRotation");
-
+                            
                             target.TargetToCurrent();
                         }
 
@@ -263,6 +269,116 @@ namespace REXTools.CustomTransforms
                     }
                 }
             });
+        }
+
+        private bool becomeHidden = false;
+        private void OnSceneGUI()
+        {
+            //check if selected is target
+            if (
+                target.editorApply &&
+                Selection.Contains(target.gameObject) &&//Selection.gameObjects.Length == 1 && Selection.activeGameObject == target.gameObject &&
+                Tools.current == Tool.Rotate)
+            {
+                if (becomeHidden == false)
+                {
+                    becomeHidden = true;
+                }
+                
+                if (!Tools.hidden)
+                {
+                    Tools.hidden = true;
+                }
+                if (CustomTransformHandlesWindow.activeType != typeof(CustomRotation))
+                {
+                    CustomTransformHandlesWindow.activeType = typeof(CustomRotation);
+                }
+
+                Quaternion rot = default;
+
+                if (target.space == Space.World)
+                {
+                    if (worldHandleRot == Space.Self)
+                    {
+                        rot = target.rotation;
+                    }
+                    else if (worldHandleRot == Space.World)
+                    {
+                        rot = Quaternion.Euler(Vector3.zero);
+                    }
+                }
+                else
+                {
+                    if (target.link == Link.Offset)
+                    {
+                        if (selfHandleRot == LinkSpaceRotation.Self)
+                        {
+                            if (!offsetHandleRotIsRaw)
+                            {
+                                rot = target.rotation;
+                            }
+                            else if (offsetHandleRotIsRaw)
+                            {
+                                rot = target.rotationRaw;
+                            }
+                        }
+                        else if (selfHandleRot == LinkSpaceRotation.Parent)
+                        {
+                            rot = target.parent.rotation;
+                        }
+                        else if (selfHandleRot == LinkSpaceRotation.World)
+                        {
+                            rot = Quaternion.Euler(Vector3.zero);
+                        }
+                    }
+                    else if (target.link == Link.Match)
+                    {
+                        if (selfHandleRot == LinkSpaceRotation.Self)
+                        {
+                            if (!offsetHandleRotIsRaw)
+                            {
+                                rot = target.rotation;
+                            }
+                            else if (offsetHandleRotIsRaw)
+                            {
+                                rot = target.rotationRaw;
+                            }
+                        }
+                        else if (selfHandleRot == LinkSpaceRotation.Parent)
+                        {
+                            rot = target.parent.rotation;
+                        }
+                        else if (selfHandleRot == LinkSpaceRotation.World)
+                        {
+                            rot = Quaternion.Euler(Vector3.zero);
+                        }
+                    }
+                }
+
+                Quaternion difference;
+
+                if (target.link == Link.Offset && offsetHandleRotIsRaw)
+                {
+                    difference = target.rotationRaw * Quaternion.Inverse(rot);
+
+                    target.rotationRaw = Handles.RotationHandle(rot, target.transform.position) * difference;
+                }
+                else
+                {
+                    difference = target.rotation * Quaternion.Inverse(rot);
+
+                    target.rotation = Handles.RotationHandle(rot, target.transform.position) * difference;
+                }
+            }
+            else
+            {
+                if (becomeHidden == true)
+                {
+                    Tools.hidden = false;
+                    becomeHidden = false;
+                    CustomTransformHandlesWindow.activeType = null;
+                }
+            }
         }
     }
 }

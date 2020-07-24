@@ -12,6 +12,11 @@ namespace REXTools.CustomTransforms
     [CustomEditor(typeof(CustomPosition))]
     public class CustomPositionEditor : EditorPRO<CustomPosition>
     {
+        public static bool offsetHandlePosIsRaw = false; 
+
+        public static LinkSpaceRotation selfHandleRot = LinkSpaceRotation.Self; //self rotation
+        public static Space worldHandleRot = Space.Self; //world rotation
+        
         //method parameters
         private Space P_Switch_Space;
         private Link P_Switch_Link;
@@ -41,6 +46,8 @@ namespace REXTools.CustomTransforms
             base.OnEnable();
 
             target.RecordParent();
+
+            becomeHidden = false;
         }
 
         public override void OnInspectorGUI()
@@ -293,6 +300,95 @@ namespace REXTools.CustomTransforms
                     }
                 }
             });
+        }
+
+        private bool becomeHidden = false;
+        private void OnSceneGUI()
+        {
+            //check if selected is target
+            if (
+                target.editorApply &&
+                Selection.Contains(target.gameObject) &&//Selection.gameObjects.Length == 1 && Selection.activeGameObject == target.gameObject &&
+                Tools.current == Tool.Move)
+            {
+                if (becomeHidden == false) {
+                    becomeHidden = true;
+                }
+
+                if (!Tools.hidden)
+                {
+                    Tools.hidden = true;
+                }
+                if (CustomTransformHandlesWindow.activeType != typeof(CustomPosition))
+                {
+                    CustomTransformHandlesWindow.activeType = typeof(CustomPosition);
+                }
+
+                Vector3 pos = default;
+                Quaternion rot = default;
+
+                if (target.space == Space.World)
+                {
+                    pos = target.transform.position;
+                    if (worldHandleRot == Space.Self)
+                    {
+                        rot =  target.transform.rotation;
+                    }
+                    else if (worldHandleRot == Space.World)
+                    {
+                        rot = Quaternion.Euler(Vector3.zero);
+                    }
+                }
+                else
+                {
+                    if (target.link == Link.Offset)
+                    {
+                        if (!offsetHandlePosIsRaw)
+                        {
+                            pos = target.position;
+                        }
+                        else if (offsetHandlePosIsRaw)
+                        {
+                            pos = target.positionRaw;
+                        }
+                    }
+                    else if (target.link == Link.Match)
+                    {
+                        pos = target.position;
+                    }
+
+                    if (selfHandleRot == LinkSpaceRotation.Self)
+                    {
+                        rot = target.transform.rotation;
+                    }
+                    else if (selfHandleRot == LinkSpaceRotation.Parent)
+                    {
+                        rot = target.parent.rotation;
+                    }
+                    else if (selfHandleRot == LinkSpaceRotation.World)
+                    {
+                        rot = Quaternion.Euler(Vector3.zero);
+                    }
+                }
+
+                if (target.link == Link.Offset && offsetHandlePosIsRaw)
+                {
+                    target.positionRaw = Handles.PositionHandle(pos, rot);
+                }
+                else
+                {
+                    target.position = Handles.PositionHandle(pos, rot);
+                }
+            }
+            else
+            {
+                if (becomeHidden == true)
+                {
+                    Tools.hidden = false;
+                    becomeHidden = false;
+                    CustomTransformHandlesWindow.activeType = null;
+                }
+            }
         }
     }
 }

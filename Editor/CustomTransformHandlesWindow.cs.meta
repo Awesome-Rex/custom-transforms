@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 02de0bef49891d3418da23b3529648ef
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - m_ViewDataDictionary: {instanceID: 0}
+  - positionIcon: {fileID: 2800000, guid: 08f4d879c75eb04449bb3048e3b1373c, type: 3}
+  - rotationIcon: {fileID: 2800000, guid: 000a895393760eb4f86628e136d6653c, type: 3}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
