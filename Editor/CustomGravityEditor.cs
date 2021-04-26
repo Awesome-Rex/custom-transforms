@@ -9,7 +9,7 @@ using System;
 
 namespace REXTools.CustomTransforms
 {
-    [CustomEditor(typeof(CustomGravity))]
+    [UnityEditor.CustomEditor(typeof(CustomGravity))]
     public class CustomGravityEditor : EditorPRO<CustomGravity>
     {
         //method parameters

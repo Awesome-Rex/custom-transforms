@@ -11,6 +11,8 @@ namespace REXTools.CustomTransforms
     public class CustomTransformHandlesWindow : EditorWindow
     {
         public static System.Type activeType = null;
+        public static dynamic activeCustomTransform;
+
 
         private bool isVertical
         {
@@ -28,28 +30,12 @@ namespace REXTools.CustomTransforms
         private GUIStyle rotationStyle;
 
         //methods
-        [MenuItem("Window/Custom Transform Handles")]
+        //[MenuItem("Window/Custom Transform Handles")]
         public static void ShowWindow()
         {
             GetWindow<CustomTransformHandlesWindow>("Custom Transform Handles");
         }
         
-        private void EnumButton<T> (System.Func<bool> press, T val, ref T set) where T : System.Enum
-        {
-            bool original = GUI.enabled;
-            if (set.Equals(val))
-            {
-                GUI.enabled = false;
-            }
-
-            if (press())
-            {
-                set = val;
-            }
-
-            GUI.enabled = original;
-        }
-
         private void DrawPositionHandles()
         {
             if (!isVertical) // horizontal
@@ -66,9 +52,9 @@ namespace REXTools.CustomTransforms
                         EditorGUILayout.LabelField("Self", EditorStyles.boldLabel, GUILayout.Width(buttonSizeClamped * 3f));
 
                         EditorGUILayout.BeginHorizontal();
-                        EnumButton(() => GUILayout.Button("Self", GUILayout.Width(buttonSizeClamped), GUILayout.Height(buttonSize)), LinkSpaceRotation.Self, ref CustomPositionEditor.selfHandleRot);
-                        EnumButton(() => GUILayout.Button("Parent", GUILayout.Width(buttonSizeClamped), GUILayout.Height(buttonSize)), LinkSpaceRotation.Parent, ref CustomPositionEditor.selfHandleRot);
-                        EnumButton(() => GUILayout.Button("World", GUILayout.Width(buttonSizeClamped), GUILayout.Height(buttonSize)), LinkSpaceRotation.World, ref CustomPositionEditor.selfHandleRot);
+                        CustomEditors.EnumButton(this, () => GUILayout.Button("Self", GUILayout.Width(buttonSizeClamped), GUILayout.Height(buttonSize)), LinkSpaceRotation.Self, ref CustomPositionEditor.selfHandleRot);
+                        CustomEditors.EnumButton(this, () => GUILayout.Button("Parent", GUILayout.Width(buttonSizeClamped), GUILayout.Height(buttonSize)), LinkSpaceRotation.Parent, ref CustomPositionEditor.selfHandleRot);
+                        CustomEditors.EnumButton(this, () => GUILayout.Button("World", GUILayout.Width(buttonSizeClamped), GUILayout.Height(buttonSize)), LinkSpaceRotation.World, ref CustomPositionEditor.selfHandleRot);
                         EditorGUILayout.EndHorizontal();
                     }
                     EditorGUILayout.EndVertical();
@@ -83,8 +69,8 @@ namespace REXTools.CustomTransforms
                         EditorGUILayout.LabelField("World", EditorStyles.boldLabel, GUILayout.Width(buttonSizeClamped * 2f));
                         
                         EditorGUILayout.BeginHorizontal();
-                        EnumButton(() => GUILayout.Button("Self", GUILayout.Width(buttonSizeClamped), GUILayout.Height(buttonSize)), Space.Self, ref CustomPositionEditor.worldHandleRot);
-                        EnumButton(() => GUILayout.Button("World", GUILayout.Width(buttonSizeClamped), GUILayout.Height(buttonSize)), Space.World, ref CustomPositionEditor.worldHandleRot);
+                        CustomEditors.EnumButton(this, () => GUILayout.Button("Self", GUILayout.Width(buttonSizeClamped), GUILayout.Height(buttonSize)), Space.Self, ref CustomPositionEditor.worldHandleRot);
+                        CustomEditors.EnumButton(this, () => GUILayout.Button("World", GUILayout.Width(buttonSizeClamped), GUILayout.Height(buttonSize)), Space.World, ref CustomPositionEditor.worldHandleRot);
                         EditorGUILayout.EndHorizontal();
                     }
                     EditorGUILayout.EndVertical();
@@ -112,13 +98,13 @@ namespace REXTools.CustomTransforms
 
                 EditorGUILayout.LabelField("Self", EditorStyles.boldLabel, GUILayout.Width(buttonSize));
 
-                EnumButton(() => GUILayout.Button("Self", GUILayout.Width(buttonSize), GUILayout.Height(buttonSize), GUILayout.MaxHeight(maxButtonSize)), LinkSpaceRotation.Self, ref CustomPositionEditor.selfHandleRot);
-                EnumButton(() => GUILayout.Button("Parent", GUILayout.Width(buttonSize), GUILayout.Height(buttonSize), GUILayout.MaxHeight(maxButtonSize)), LinkSpaceRotation.Parent, ref CustomPositionEditor.selfHandleRot);
-                EnumButton(() => GUILayout.Button("World", GUILayout.Width(buttonSize), GUILayout.Height(buttonSize), GUILayout.MaxHeight(maxButtonSize)), LinkSpaceRotation.World, ref CustomPositionEditor.selfHandleRot);
+                CustomEditors.EnumButton(this, () => GUILayout.Button("Self", GUILayout.Width(buttonSize), GUILayout.Height(buttonSize), GUILayout.MaxHeight(maxButtonSize)), LinkSpaceRotation.Self, ref CustomPositionEditor.selfHandleRot);
+                CustomEditors.EnumButton(this, () => GUILayout.Button("Parent", GUILayout.Width(buttonSize), GUILayout.Height(buttonSize), GUILayout.MaxHeight(maxButtonSize)), LinkSpaceRotation.Parent, ref CustomPositionEditor.selfHandleRot);
+                CustomEditors.EnumButton(this, () => GUILayout.Button("World", GUILayout.Width(buttonSize), GUILayout.Height(buttonSize), GUILayout.MaxHeight(maxButtonSize)), LinkSpaceRotation.World, ref CustomPositionEditor.selfHandleRot);
                 
                 EditorGUILayout.LabelField("World", EditorStyles.boldLabel, GUILayout.Width(buttonSize));
-                EnumButton(() => GUILayout.Button("Self", GUILayout.Width(buttonSize), GUILayout.Height(buttonSize), GUILayout.MaxHeight(maxButtonSize)), Space.Self, ref CustomPositionEditor.worldHandleRot);
-                EnumButton(() => GUILayout.Button("World", GUILayout.Width(buttonSize), GUILayout.Height(buttonSize), GUILayout.MaxHeight(maxButtonSize)), Space.World, ref CustomPositionEditor.worldHandleRot);
+                CustomEditors.EnumButton(this, () => GUILayout.Button("Self", GUILayout.Width(buttonSize), GUILayout.Height(buttonSize), GUILayout.MaxHeight(maxButtonSize)), Space.Self, ref CustomPositionEditor.worldHandleRot);
+                CustomEditors.EnumButton(this, () => GUILayout.Button("World", GUILayout.Width(buttonSize), GUILayout.Height(buttonSize), GUILayout.MaxHeight(maxButtonSize)), Space.World, ref CustomPositionEditor.worldHandleRot);
                 EditorGUILayout.LabelField("Extra", EditorStyles.boldLabel, GUILayout.Width(position.width));
 
                 CustomPositionEditor.offsetHandlePosIsRaw = EditorGUILayout.Toggle(new GUIContent(string.Empty, "Use Raw Position"), CustomPositionEditor.offsetHandlePosIsRaw, GUILayout.Width(buttonSize));
@@ -140,9 +126,9 @@ namespace REXTools.CustomTransforms
                         EditorGUILayout.LabelField("Self", EditorStyles.boldLabel, GUILayout.Width(buttonSizeClamped * 3f));
 
                         EditorGUILayout.BeginHorizontal();
-                        EnumButton(() => GUILayout.Button("Self", GUILayout.Width(buttonSizeClamped), GUILayout.Height(buttonSize)), LinkSpaceRotation.Self, ref CustomRotationEditor.selfHandleRot);
-                        EnumButton(() => GUILayout.Button("Parent", GUILayout.Width(buttonSizeClamped), GUILayout.Height(buttonSize)), LinkSpaceRotation.Parent, ref CustomRotationEditor.selfHandleRot);
-                        EnumButton(() => GUILayout.Button("World", GUILayout.Width(buttonSizeClamped), GUILayout.Height(buttonSize)), LinkSpaceRotation.World, ref CustomRotationEditor.selfHandleRot);
+                        CustomEditors.EnumButton(this, () => GUILayout.Button("Self", GUILayout.Width(buttonSizeClamped), GUILayout.Height(buttonSize)), LinkSpaceRotation.Self, ref CustomRotationEditor.selfHandleRot);
+                        CustomEditors.EnumButton(this, () => GUILayout.Button("Parent", GUILayout.Width(buttonSizeClamped), GUILayout.Height(buttonSize)), LinkSpaceRotation.Parent, ref CustomRotationEditor.selfHandleRot);
+                        CustomEditors.EnumButton(this, () => GUILayout.Button("World", GUILayout.Width(buttonSizeClamped), GUILayout.Height(buttonSize)), LinkSpaceRotation.World, ref CustomRotationEditor.selfHandleRot);
                         EditorGUILayout.EndHorizontal();
                     }
                     EditorGUILayout.EndVertical();
@@ -157,8 +143,8 @@ namespace REXTools.CustomTransforms
                         EditorGUILayout.LabelField("World", EditorStyles.boldLabel, GUILayout.Width(buttonSizeClamped * 2f));
 
                         EditorGUILayout.BeginHorizontal();
-                        EnumButton(() => GUILayout.Button("Self", GUILayout.Width(buttonSizeClamped), GUILayout.Height(buttonSize)), Space.Self, ref CustomRotationEditor.worldHandleRot);
-                        EnumButton(() => GUILayout.Button("World", GUILayout.Width(buttonSizeClamped), GUILayout.Height(buttonSize)), Space.World, ref CustomRotationEditor.worldHandleRot);
+                        CustomEditors.EnumButton(this, () => GUILayout.Button("Self", GUILayout.Width(buttonSizeClamped), GUILayout.Height(buttonSize)), Space.Self, ref CustomRotationEditor.worldHandleRot);
+                        CustomEditors.EnumButton(this, () => GUILayout.Button("World", GUILayout.Width(buttonSizeClamped), GUILayout.Height(buttonSize)), Space.World, ref CustomRotationEditor.worldHandleRot);
                         EditorGUILayout.EndHorizontal();
                     }
                     EditorGUILayout.EndVertical();
@@ -186,13 +172,13 @@ namespace REXTools.CustomTransforms
 
                 EditorGUILayout.LabelField("Self", EditorStyles.boldLabel, GUILayout.Width(buttonSize));
 
-                EnumButton(() => GUILayout.Button("Self", GUILayout.Width(buttonSize), GUILayout.Height(buttonSize), GUILayout.MaxHeight(maxButtonSize)), LinkSpaceRotation.Self, ref CustomRotationEditor.selfHandleRot);
-                EnumButton(() => GUILayout.Button("Parent", GUILayout.Width(buttonSize), GUILayout.Height(buttonSize), GUILayout.MaxHeight(maxButtonSize)), LinkSpaceRotation.Parent, ref CustomRotationEditor.selfHandleRot);
-                EnumButton(() => GUILayout.Button("World", GUILayout.Width(buttonSize), GUILayout.Height(buttonSize), GUILayout.MaxHeight(maxButtonSize)), LinkSpaceRotation.World, ref CustomRotationEditor.selfHandleRot);
+                CustomEditors.EnumButton(this, () => GUILayout.Button("Self", GUILayout.Width(buttonSize), GUILayout.Height(buttonSize), GUILayout.MaxHeight(maxButtonSize)), LinkSpaceRotation.Self, ref CustomRotationEditor.selfHandleRot);
+                CustomEditors.EnumButton(this, () => GUILayout.Button("Parent", GUILayout.Width(buttonSize), GUILayout.Height(buttonSize), GUILayout.MaxHeight(maxButtonSize)), LinkSpaceRotation.Parent, ref CustomRotationEditor.selfHandleRot);
+                CustomEditors.EnumButton(this, () => GUILayout.Button("World", GUILayout.Width(buttonSize), GUILayout.Height(buttonSize), GUILayout.MaxHeight(maxButtonSize)), LinkSpaceRotation.World, ref CustomRotationEditor.selfHandleRot);
 
                 EditorGUILayout.LabelField("World", EditorStyles.boldLabel, GUILayout.Width(buttonSize));
-                EnumButton(() => GUILayout.Button("Self", GUILayout.Width(buttonSize), GUILayout.Height(buttonSize), GUILayout.MaxHeight(maxButtonSize)), Space.Self, ref CustomRotationEditor.worldHandleRot);
-                EnumButton(() => GUILayout.Button("World", GUILayout.Width(buttonSize), GUILayout.Height(buttonSize), GUILayout.MaxHeight(maxButtonSize)), Space.World, ref CustomRotationEditor.worldHandleRot);
+                CustomEditors.EnumButton(this, () => GUILayout.Button("Self", GUILayout.Width(buttonSize), GUILayout.Height(buttonSize), GUILayout.MaxHeight(maxButtonSize)), Space.Self, ref CustomRotationEditor.worldHandleRot);
+                CustomEditors.EnumButton(this, () => GUILayout.Button("World", GUILayout.Width(buttonSize), GUILayout.Height(buttonSize), GUILayout.MaxHeight(maxButtonSize)), Space.World, ref CustomRotationEditor.worldHandleRot);
                 EditorGUILayout.LabelField("Extra", EditorStyles.boldLabel, GUILayout.Width(position.width));
 
                 CustomRotationEditor.offsetHandleRotIsRaw = EditorGUILayout.Toggle(new GUIContent(string.Empty, "Use Raw Rotation"), CustomRotationEditor.offsetHandleRotIsRaw, GUILayout.Width(buttonSize));

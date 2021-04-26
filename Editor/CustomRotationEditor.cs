@@ -9,7 +9,7 @@ using System;
 
 namespace REXTools.CustomTransforms
 {
-    [CustomEditor(typeof(CustomRotation))]
+    [UnityEditor.CustomEditor(typeof(CustomRotation))]
     public class CustomRotationEditor : EditorPRO<CustomRotation>
     {
         public static bool offsetHandleRotIsRaw = false; //offset
@@ -252,6 +252,9 @@ namespace REXTools.CustomTransforms
 
                             target.applyInEditor = true;
 
+                            //NEW STUFF
+                            CustomTransformHandlesWindow.ShowWindow();
+
                             target.EditorApplyCheck();
                         }
                     }
@@ -292,7 +295,12 @@ namespace REXTools.CustomTransforms
                 if (CustomTransformHandlesWindow.activeType != typeof(CustomRotation))
                 {
                     CustomTransformHandlesWindow.activeType = typeof(CustomRotation);
+                    CustomTransformHandlesWindow.activeCustomTransform = target;
                 }
+                //if ((CustomRotation)CustomTransformHandlesWindow.activeCustomTransform != target)
+                //{
+                    
+                //}
 
                 Quaternion rot = default;
 
@@ -376,7 +384,9 @@ namespace REXTools.CustomTransforms
                 {
                     Tools.hidden = false;
                     becomeHidden = false;
+
                     CustomTransformHandlesWindow.activeType = null;
+                    CustomTransformHandlesWindow.activeCustomTransform = null;
                 }
             }
         }

@@ -9,14 +9,14 @@ using System;
 
 namespace REXTools.CustomTransforms
 {
-    [CustomEditor(typeof(CustomPosition))]
+    [UnityEditor.CustomEditor(typeof(CustomPosition))]
     public class CustomPositionEditor : EditorPRO<CustomPosition>
     {
-        public static bool offsetHandlePosIsRaw = false; 
+        public static bool offsetHandlePosIsRaw = false;
 
         public static LinkSpaceRotation selfHandleRot = LinkSpaceRotation.Self; //self rotation
         public static Space worldHandleRot = Space.Self; //world rotation
-        
+
         //method parameters
         private Space P_Switch_Space;
         private Link P_Switch_Link;
@@ -166,8 +166,8 @@ namespace REXTools.CustomTransforms
                             target.Switch(P_Switch_Space, P_Switch_Link);
                         },
                         new Action[] {
-                                    () => P_Switch_Space = (Space)EditorGUILayout.EnumPopup(GUIContent.none, P_Switch_Space),
-                                    () => P_Switch_Link = (Link)EditorGUILayout.EnumPopup(GUIContent.none, P_Switch_Link)
+                                () => P_Switch_Space = (Space)EditorGUILayout.EnumPopup(GUIContent.none, P_Switch_Space),
+                                () => P_Switch_Link = (Link)EditorGUILayout.EnumPopup(GUIContent.none, P_Switch_Link)
                         }, "Switched CustomPosition Space and/or Link", target.gameObject);
 
                         Function("Switch Parent", () =>
@@ -175,7 +175,7 @@ namespace REXTools.CustomTransforms
                             target.Switch(P_Switch_Space, P_Switch_Link);
                         },
                         new Action[] {
-                                    () => P_SwitchParent_Parent = (Transform)EditorGUILayout.ObjectField(GUIContent.none, P_SwitchParent_Parent, typeof(Transform), true)
+                                () => P_SwitchParent_Parent = (Transform)EditorGUILayout.ObjectField(GUIContent.none, P_SwitchParent_Parent, typeof(Transform), true)
                         }, "Switched CustomPosition Parent", target.gameObject);
 
                         Function("Switch Factor Scale", () =>
@@ -183,7 +183,7 @@ namespace REXTools.CustomTransforms
                             target.SwitchFactorScale(P_SwitchFactorScale_Factor);
                         },
                         new Action[] {
-                                    () => P_SwitchFactorScale_Factor = EditorGUILayout.Toggle(GUIContent.none, P_SwitchFactorScale_Factor)
+                                () => P_SwitchFactorScale_Factor = EditorGUILayout.Toggle(GUIContent.none, P_SwitchFactorScale_Factor)
                         }, "Switched CustomPosition FactorScale", target.gameObject);
 
                         Function("Apply Offset Scale", () =>
@@ -191,7 +191,7 @@ namespace REXTools.CustomTransforms
                             target.ApplyOffsetScale(P_ApplyOffsetScale_NewScale);
                         },
                         new Action[] {
-                                () => P_ApplyOffsetScale_NewScale = EditorGUILayout.FloatField(GUIContent.none, P_ApplyOffsetScale_NewScale)
+                            () => P_ApplyOffsetScale_NewScale = EditorGUILayout.FloatField(GUIContent.none, P_ApplyOffsetScale_NewScale)
                         }, "Applied CustomPosition OffsetScale", target.gameObject);
 
                         Function("Remove Offset", () =>
@@ -235,30 +235,30 @@ namespace REXTools.CustomTransforms
                             }
                         },
                             new Action[] {
-                                    () => {
-                                    EditorGUI.BeginChangeCheck();
-                                    P_SetContext_Type = (LinkSpace)EditorGUILayout.EnumPopup("Type", P_SetContext_Type);
-                                    if (EditorGUI.EndChangeCheck())
+                                () => {
+                                EditorGUI.BeginChangeCheck();
+                                P_SetContext_Type = (LinkSpace)EditorGUILayout.EnumPopup("Type", P_SetContext_Type);
+                                if (EditorGUI.EndChangeCheck())
+                                {
+                                    if (P_SetContext_Type == LinkSpace.World)
                                     {
-                                        if (P_SetContext_Type == LinkSpace.World)
-                                        {
-                                            P_SetContext_New = target.position;
+                                        P_SetContext_New = target.position;
+                                    }
+                                    else if (P_SetContext_Type == LinkSpace.Self)
+                                    {
+                                        P_SetContext_New = target.localPosition;
+                                    }
+                                    else if (P_SetContext_Type == LinkSpace.WorldRaw)
+                                    {
+                                        P_SetContext_New = target.positionRaw;
+                                    }
+                                    else if (P_SetContext_Type == LinkSpace.SelfRaw)
+                                    {
+                                        P_SetContext_New = target.localPositionRaw;
                                         }
-                                        else if (P_SetContext_Type == LinkSpace.Self)
-                                        {
-                                            P_SetContext_New = target.localPosition;
-                                        }
-                                        else if (P_SetContext_Type == LinkSpace.WorldRaw)
-                                        {
-                                            P_SetContext_New = target.positionRaw;
-                                        }
-                                        else if (P_SetContext_Type == LinkSpace.SelfRaw)
-                                        {
-                                            P_SetContext_New = target.localPositionRaw;
-                                            }
-                                        }
-                                    },
-                                    () => P_SetContext_New = EditorGUILayout.Vector3Field(GUIContent.none, P_SetContext_New)
+                                    }
+                                },
+                                () => P_SetContext_New = EditorGUILayout.Vector3Field(GUIContent.none, P_SetContext_New)
                             }, "Changed Context Value of CustomPosition", target.gameObject);
 
                         GUI.enabled = true;
@@ -283,6 +283,9 @@ namespace REXTools.CustomTransforms
 
                             target.applyInEditor = true;
 
+                            //NEW STUFF
+                            CustomTransformHandlesWindow.ShowWindow();
+
                             target.EditorApplyCheck();
                         }
                     }
@@ -305,13 +308,17 @@ namespace REXTools.CustomTransforms
         private bool becomeHidden = false;
         private void OnSceneGUI()
         {
+            //Debug.Log("SceneGUI");
+            //CustomPosition.SetCheckedEnumMenuItems();
+
             //check if selected is target
             if (
                 target.editorApply &&
                 Selection.Contains(target.gameObject) &&//Selection.gameObjects.Length == 1 && Selection.activeGameObject == target.gameObject &&
                 Tools.current == Tool.Move)
             {
-                if (becomeHidden == false) {
+                if (becomeHidden == false)
+                {
                     becomeHidden = true;
                 }
 
@@ -322,7 +329,12 @@ namespace REXTools.CustomTransforms
                 if (CustomTransformHandlesWindow.activeType != typeof(CustomPosition))
                 {
                     CustomTransformHandlesWindow.activeType = typeof(CustomPosition);
+                    CustomTransformHandlesWindow.activeCustomTransform = target;
                 }
+                //if ((CustomPosition)CustomTransformHandlesWindow.activeCustomTransform != target)
+                //{
+                    
+                //}
 
                 Vector3 pos = default;
                 Quaternion rot = default;
@@ -332,7 +344,7 @@ namespace REXTools.CustomTransforms
                     pos = target.transform.position;
                     if (worldHandleRot == Space.Self)
                     {
-                        rot =  target.transform.rotation;
+                        rot = target.transform.rotation;
                     }
                     else if (worldHandleRot == Space.World)
                     {
@@ -386,7 +398,9 @@ namespace REXTools.CustomTransforms
                 {
                     Tools.hidden = false;
                     becomeHidden = false;
+                    
                     CustomTransformHandlesWindow.activeType = null;
+                    CustomTransformHandlesWindow.activeCustomTransform = null;
                 }
             }
         }
