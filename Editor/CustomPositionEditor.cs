@@ -4,6 +4,7 @@ using UnityEngine;
 
 using UnityEditor;
 using REXTools.REXCore;
+using REXTools.TransformTools;
 using REXTools.EditorTools;
 using System;
 
@@ -12,7 +13,7 @@ namespace REXTools.CustomTransforms
     [UnityEditor.CustomEditor(typeof(CustomPosition))]
     public class CustomPositionEditor : EditorPRO<CustomPosition>
     {
-        public static bool offsetHandlePosIsRaw = false;
+        public static bool offsetHandleRaw = false; //whether or not offset handle position is raw
 
         public static LinkSpaceRotation selfHandleRot = LinkSpaceRotation.Self; //self rotation
         public static Space worldHandleRot = Space.Self; //world rotation
@@ -21,7 +22,7 @@ namespace REXTools.CustomTransforms
         private Space P_Switch_Space;
         private Link P_Switch_Link;
 
-        private Transform P_SwitchParent_Parent;
+        [SerializeField] private TransformObject P_SwitchParent_Parent;
 
         private LinkSpace P_SetContext_Type;
         private Vector3 P_SetContext_New;
@@ -32,6 +33,8 @@ namespace REXTools.CustomTransforms
 
         protected override void DeclareProperties()
         {
+            AddProperty("_parent");
+
             AddProperty("value");
 
             AddProperty("transition");
@@ -39,6 +42,8 @@ namespace REXTools.CustomTransforms
             AddProperty("link");
 
             AddProperty("space");
+
+            AddPropertyEditor("P_SwitchParent_Parent");
         }
 
         protected override void OnEnable()
@@ -61,7 +66,8 @@ namespace REXTools.CustomTransforms
                 EditorGUILayout.LabelField("Position", EditorStyles.boldLabel);
                 if (target.space == Space.Self)
                 {
-                    target.parent = (Transform)EditorGUILayout.ObjectField("Parent", target.parent, typeof(Transform), true);
+                    //target.parent = (Transform)EditorGUILayout.ObjectField("Parent", target.parent, typeof(Transform), true);
+                    EditorGUILayout.PropertyField(FindProperty("_parent"));
                 }
                 if (!(target.space == Space.Self && target.link == Link.Match))
                 {
@@ -175,7 +181,7 @@ namespace REXTools.CustomTransforms
                             target.Switch(P_Switch_Space, P_Switch_Link);
                         },
                         new Action[] {
-                                () => P_SwitchParent_Parent = (Transform)EditorGUILayout.ObjectField(GUIContent.none, P_SwitchParent_Parent, typeof(Transform), true)
+                            () => EditorGUILayout.PropertyField(FindPropertyEditor("P_SwitchParent_Parent"), GUIContent.none)
                         }, "Switched CustomPosition Parent", target.gameObject);
 
                         Function("Switch Factor Scale", () =>
@@ -284,7 +290,7 @@ namespace REXTools.CustomTransforms
                             target.applyInEditor = true;
 
                             //NEW STUFF
-                            CustomTransformHandlesWindow.ShowWindow();
+                            //CustomTransformHandlesWindow.ShowWindow();
 
                             target.EditorApplyCheck();
                         }
@@ -355,11 +361,11 @@ namespace REXTools.CustomTransforms
                 {
                     if (target.link == Link.Offset)
                     {
-                        if (!offsetHandlePosIsRaw)
+                        if (!offsetHandleRaw)
                         {
                             pos = target.position;
                         }
-                        else if (offsetHandlePosIsRaw)
+                        else if (offsetHandleRaw)
                         {
                             pos = target.positionRaw;
                         }
@@ -383,7 +389,7 @@ namespace REXTools.CustomTransforms
                     }
                 }
 
-                if (target.link == Link.Offset && offsetHandlePosIsRaw)
+                if (target.link == Link.Offset && offsetHandleRaw)
                 {
                     target.positionRaw = Handles.PositionHandle(pos, rot);
                 }

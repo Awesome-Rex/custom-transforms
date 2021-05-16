@@ -84,7 +84,7 @@ namespace REXTools.CustomTransforms
                     {
                         EditorGUILayout.LabelField("Extra", EditorStyles.boldLabel);
 
-                        CustomPositionEditor.offsetHandlePosIsRaw = EditorGUILayout.Toggle("Use Raw Position", CustomPositionEditor.offsetHandlePosIsRaw);
+                        CustomPositionEditor.offsetHandleRaw = EditorGUILayout.Toggle("Use Raw Position", CustomPositionEditor.offsetHandleRaw);
                     }
                     EditorGUILayout.EndVertical();
                 }
@@ -107,7 +107,7 @@ namespace REXTools.CustomTransforms
                 CustomEditors.EnumButton(this, () => GUILayout.Button("World", GUILayout.Width(buttonSize), GUILayout.Height(buttonSize), GUILayout.MaxHeight(maxButtonSize)), Space.World, ref CustomPositionEditor.worldHandleRot);
                 EditorGUILayout.LabelField("Extra", EditorStyles.boldLabel, GUILayout.Width(position.width));
 
-                CustomPositionEditor.offsetHandlePosIsRaw = EditorGUILayout.Toggle(new GUIContent(string.Empty, "Use Raw Position"), CustomPositionEditor.offsetHandlePosIsRaw, GUILayout.Width(buttonSize));
+                CustomPositionEditor.offsetHandleRaw = EditorGUILayout.Toggle(new GUIContent(string.Empty, "Use Raw Position"), CustomPositionEditor.offsetHandleRaw, GUILayout.Width(buttonSize));
             }
         }
         private void DrawRotationHandles ()
@@ -158,7 +158,7 @@ namespace REXTools.CustomTransforms
                     {
                         EditorGUILayout.LabelField("Extra", EditorStyles.boldLabel);
 
-                        CustomRotationEditor.offsetHandleRotIsRaw = EditorGUILayout.Toggle("Use Raw Rotation", CustomRotationEditor.offsetHandleRotIsRaw);
+                        CustomRotationEditor.offsetHandleRaw = EditorGUILayout.Toggle("Use Raw Rotation", CustomRotationEditor.offsetHandleRaw);
                     }
                     EditorGUILayout.EndVertical();
                 }
@@ -181,7 +181,7 @@ namespace REXTools.CustomTransforms
                 CustomEditors.EnumButton(this, () => GUILayout.Button("World", GUILayout.Width(buttonSize), GUILayout.Height(buttonSize), GUILayout.MaxHeight(maxButtonSize)), Space.World, ref CustomRotationEditor.worldHandleRot);
                 EditorGUILayout.LabelField("Extra", EditorStyles.boldLabel, GUILayout.Width(position.width));
 
-                CustomRotationEditor.offsetHandleRotIsRaw = EditorGUILayout.Toggle(new GUIContent(string.Empty, "Use Raw Rotation"), CustomRotationEditor.offsetHandleRotIsRaw, GUILayout.Width(buttonSize));
+                CustomRotationEditor.offsetHandleRaw = EditorGUILayout.Toggle(new GUIContent(string.Empty, "Use Raw Rotation"), CustomRotationEditor.offsetHandleRaw, GUILayout.Width(buttonSize));
             }
         }
 

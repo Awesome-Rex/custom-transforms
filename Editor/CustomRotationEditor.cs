@@ -4,6 +4,7 @@ using UnityEngine;
 
 using UnityEditor;
 using REXTools.REXCore;
+using REXTools.TransformTools;
 using REXTools.EditorTools;
 using System;
 
@@ -12,7 +13,8 @@ namespace REXTools.CustomTransforms
     [UnityEditor.CustomEditor(typeof(CustomRotation))]
     public class CustomRotationEditor : EditorPRO<CustomRotation>
     {
-        public static bool offsetHandleRotIsRaw = false; //offset
+        public static bool offsetHandleRaw = false; //offset
+
         public static LinkSpaceRotation selfHandleRot = LinkSpaceRotation.Self; //self
         public static Space worldHandleRot = Space.Self; //world rotation
 
@@ -20,13 +22,15 @@ namespace REXTools.CustomTransforms
         private Space P_Switch_Space;
         private Link P_Switch_Link;
 
-        private Transform P_SwitchParent_Parent;
+        [SerializeField] private TransformObject P_SwitchParent_Parent;
 
         private LinkSpace P_SetContext_Type;
         private Vector3 P_SetContext_New;
 
         protected override void DeclareProperties()
         {
+            AddProperty("_parent");
+
             AddProperty("value");
 
             AddProperty("transition");
@@ -34,6 +38,8 @@ namespace REXTools.CustomTransforms
             AddProperty("link");
 
             AddProperty("space");
+
+            AddPropertyEditor("P_SwitchParent_Parent");
         }
 
         protected override void OnEnable()
@@ -56,7 +62,8 @@ namespace REXTools.CustomTransforms
                 EditorGUILayout.LabelField("Rotation", EditorStyles.boldLabel);
                 if (target.space == Space.Self)
                 {
-                    target.parent = (Transform)EditorGUILayout.ObjectField("Parent", target.parent, typeof(Transform), true);
+                    //target.parent = (Transform)EditorGUILayout.ObjectField("Parent", target.parent, typeof(Transform), true);
+                    EditorGUILayout.PropertyField(FindProperty("_parent"));
                 }
                 if (!(target.space == Space.Self && target.link == Link.Match))
                 {
@@ -157,9 +164,9 @@ namespace REXTools.CustomTransforms
                         {
                             target.Switch(P_Switch_Space, P_Switch_Link);
                         },
-                    new Action[] {
-                                    () => P_SwitchParent_Parent = (Transform)EditorGUILayout.ObjectField(GUIContent.none, P_SwitchParent_Parent, typeof(Transform), true)
-                    }, "Switched CustomRotation Parent", target.gameObject);
+                        new Action[] {
+                            () => EditorGUILayout.PropertyField(FindPropertyEditor("P_SwitchParent_Parent"), GUIContent.none)
+                        }, "Switched CustomRotation Parent", target.gameObject);
 
                         Function("Remove Offset", () =>
                         {
@@ -253,7 +260,7 @@ namespace REXTools.CustomTransforms
                             target.applyInEditor = true;
 
                             //NEW STUFF
-                            CustomTransformHandlesWindow.ShowWindow();
+                            //CustomTransformHandlesWindow.ShowWindow();
 
                             target.EditorApplyCheck();
                         }
@@ -321,11 +328,11 @@ namespace REXTools.CustomTransforms
                     {
                         if (selfHandleRot == LinkSpaceRotation.Self)
                         {
-                            if (!offsetHandleRotIsRaw)
+                            if (!offsetHandleRaw)
                             {
                                 rot = target.rotation;
                             }
-                            else if (offsetHandleRotIsRaw)
+                            else if (offsetHandleRaw)
                             {
                                 rot = target.rotationRaw;
                             }
@@ -343,11 +350,11 @@ namespace REXTools.CustomTransforms
                     {
                         if (selfHandleRot == LinkSpaceRotation.Self)
                         {
-                            if (!offsetHandleRotIsRaw)
+                            if (!offsetHandleRaw)
                             {
                                 rot = target.rotation;
                             }
-                            else if (offsetHandleRotIsRaw)
+                            else if (offsetHandleRaw)
                             {
                                 rot = target.rotationRaw;
                             }
@@ -365,7 +372,7 @@ namespace REXTools.CustomTransforms
 
                 Quaternion difference;
 
-                if (target.link == Link.Offset && offsetHandleRotIsRaw)
+                if (target.link == Link.Offset && offsetHandleRaw)
                 {
                     difference = target.rotationRaw * Quaternion.Inverse(rot);
 

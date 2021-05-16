@@ -1,7 +1,9 @@
-﻿using REXTools.REXCore;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+
+using REXTools.REXCore;
+using REXTools.TransformTools;
 
 namespace REXTools.CustomTransforms
 {
@@ -13,9 +15,31 @@ namespace REXTools.CustomTransforms
         //properties
         public Space space = Space.Self;
 
-        public Transform parent;
-        public T value;
+        //public Transform parent;
+        public TransformObject parent
+        {
+            get
+            {
+                if (_parent != null)
+                {
+                    if (!_parent.isNull) {
+                        return _parent;
+                    } else
+                    {
+                        return null;
+                    }
+                } else
+                {
+                    return null;
+                }
+            }
+        }
+        [SerializeField]
+        public TransformObject _parent;
 
+        public T value; //original position/rotation/direction in world space
+
+        
         protected T previous;
 
         //methods
@@ -23,9 +47,8 @@ namespace REXTools.CustomTransforms
 
         public abstract void SetPrevious();
 
+        //inspector method
         public abstract void Switch(Space newSpace, Link newLink);
-
-        public abstract void SwitchParent(Transform newParent);
 
         protected virtual void Awake()
         {

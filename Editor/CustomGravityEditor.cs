@@ -26,6 +26,8 @@ namespace REXTools.CustomTransforms
 
         protected override void DeclareProperties()
         {
+            AddProperty("_parent");
+
             AddProperty("offset");
 
             AddProperty("space");
@@ -49,7 +51,8 @@ namespace REXTools.CustomTransforms
                 EditorGUILayout.LabelField("Direction", EditorStyles.boldLabel);
                 if (target.space == Space.Self)
                 {
-                    target.parent = (Transform)EditorGUILayout.ObjectField("Parent", target.parent, typeof(Transform), true);
+                    //target.parent = (Transform)EditorGUILayout.ObjectField("Parent", target.parent, typeof(Transform), true);
+                    EditorGUILayout.PropertyField(FindProperty("_parent"));
                 }
                 target.value = EditorGUILayout.Vector3Field("Value", target.value);
                 target.gravity = EditorGUILayout.FloatField("Force", target.gravity);
@@ -123,12 +126,12 @@ namespace REXTools.CustomTransforms
                                 () => P_Switch_Link = (Link)EditorGUILayout.EnumPopup(GUIContent.none, P_Switch_Link)
                                 }, "Switched CustomGravity Space and/or Link", target.gameObject);
 
-                        Function("Switch Parent", () =>
-                        {
-                            target.SwitchParent(P_SwitchParent_Parent);
-                        }, new Action[] {
-                                () => P_SwitchParent_Parent = (Transform)EditorGUILayout.ObjectField(GUIContent.none, P_SwitchParent_Parent, typeof(Transform), true)
-                                }, "Switched CustomGravity Parent", target.gameObject);
+                        //Function("Switch Parent", () =>
+                        //{
+                        //    target.SwitchParent(P_SwitchParent_Parent);
+                        //}, new Action[] {
+                        //        () => P_SwitchParent_Parent = (Transform)EditorGUILayout.ObjectField(GUIContent.none, P_SwitchParent_Parent, typeof(Transform), true)
+                        //        }, "Switched CustomGravity Parent", target.gameObject);
 
                         Function("Remove Offset", () =>
                         {
